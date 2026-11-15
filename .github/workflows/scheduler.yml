@@ -1,4 +1,3 @@
-
 name: Telegram scheduled posts
 
 on:
@@ -17,7 +16,18 @@ jobs:
         with:
           node-version: 22
 
+      - name: Prepare Telegram Serverless project
+        env:
+          TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
+        run: |
+          mkdir tgcloud-project
+          cd tgcloud-project
+          npx --yes @tgcloud/cli init --no-git
+          printf '%s\n' "$TGCLOUD_TOKEN" | npx --yes @tgcloud/cli login
+          npx --yes @tgcloud/cli pull
+
       - name: Run due schedules
+        working-directory: tgcloud-project
         env:
           TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
         run: |
