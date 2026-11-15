@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
+    env:
+      TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
+
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -17,18 +20,13 @@ jobs:
           node-version: 22
 
       - name: Prepare Telegram Serverless project
-        env:
-          TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
         run: |
           mkdir tgcloud-project
           cd tgcloud-project
           npx --yes @tgcloud/cli init --no-git
-          printf '%s\n' "$TGCLOUD_TOKEN" | npx --yes @tgcloud/cli login
           npx --yes @tgcloud/cli pull
 
       - name: Run due schedules
         working-directory: tgcloud-project
-        env:
-          TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
         run: |
           npx --yes @tgcloud/cli run endpoints/runScheduled '{}' --ctx '{initData:{user:{id:270588872}}}'
